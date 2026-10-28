@@ -17,7 +17,7 @@
   --bg: #0b0b0d; --surface: #151518; --raised: #1f1f24; --line: #2c2c33;
   --ink: #f5f4f0; --muted: #91919b; --on-accent: #ffffff;
   --accent: #ff5a1f; --accent-2: #ffb21f; --eat: #4da3ff; --good: #3ddc84;
-  --hero-a: #ff6a2b; --hero-b: #e8391a; --hero-c: #9e1f0e; --shade: rgba(0, 0, 0, .24); --gloss: rgba(255, 255, 255, .08);
+  --hero-a: #ff6a2b; --hero-b: #e8391a; --hero-c: #9e1f0e; --shade: rgba(0, 0, 0, .24); --gloss: rgba(255, 255, 255, .08); --ecg-base: rgba(255, 255, 255, .22);
   --font: "Kanit", "Leelawadee UI", "Noto Sans Thai", system-ui, sans-serif;
   color-scheme: dark;
 }
@@ -46,6 +46,12 @@ h2 { font: 600 1.15rem var(--font); margin: 0 }
 .hero::after { content: ""; position: absolute; width: 260px; height: 260px; right: -90px; top: -110px; border-radius: 50%;
   background: radial-gradient(circle, var(--gloss), transparent 70%); pointer-events: none }
 .hero > * { position: relative }
+.hero > .ecg { position: absolute; right: 0; top: 40px; width: 64%; height: 96px; pointer-events: none; overflow: visible }
+.ecg path { fill: none; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke }
+.ecg .base { stroke: var(--ecg-base); stroke-width: 2 }
+.ecg .beat { stroke: var(--on-accent); stroke-width: 3; stroke-dasharray: 22 78; animation: beat 2.2s linear infinite;
+  filter: drop-shadow(0 0 6px var(--on-accent)) }
+@keyframes beat { from { stroke-dashoffset: 100 } to { stroke-dashoffset: 0 } }
 .hero-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: .9rem }
 .hero-top .day { font-weight: 500; opacity: .92 }
 .streak { background: var(--shade); border-radius: 999px; padding: 3px 12px; font-weight: 600; white-space: nowrap }
@@ -167,7 +173,7 @@ footer { font-size: .78rem; color: var(--muted); text-align: center }
   .big { font-size: 3.9rem }
   .row3 { grid-template-columns: 1fr 1fr }
 }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important } .panel { animation: none } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important } .panel, .ecg .beat { animation: none } .ecg .beat { stroke-dasharray: none; opacity: .5 } }
 </style>
 
 <div class="wrap">
@@ -179,6 +185,10 @@ footer { font-size: .78rem; color: var(--muted); text-align: center }
   <!-- HOME -->
   <section class="panel" data-panel="home">
     <div class="hero" id="hero">
+      <svg class="ecg" viewBox="0 0 400 100" preserveAspectRatio="none" aria-hidden="true">
+        <path class="base" pathLength="100" d="M0 55H90L105 55L115 22L128 88L140 38L150 55H230L245 55L255 22L268 88L280 38L290 55H400"/>
+        <path class="beat" pathLength="100" d="M0 55H90L105 55L115 22L128 88L140 38L150 55H230L245 55L255 22L268 88L280 38L290 55H400"/>
+      </svg>
       <div class="hero-top"><span class="day" id="greet"></span><span class="streak">🔥 <span id="sStreak">0</span> วันติด</span></div>
       <div class="big"><span id="sBurn">0</span><small>KCAL</small></div>
       <div class="hero-sub" id="goalText"></div>
