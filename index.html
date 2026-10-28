@@ -64,6 +64,21 @@ body { background:
 .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--burn); margin-right: 8px; vertical-align: 1px;
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--burn) 22%, transparent) }
 .save-state { position: relative; font-size: .8rem; color: var(--muted) }
+.greet { font-weight: 600; color: var(--accent); font-size: .9rem }
+.quick { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px }
+.pick { text-align: left; font: inherit; color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 12px;
+  padding: 10px 12px; cursor: pointer; display: grid; gap: 2px; transition: border-color .15s, background .15s, transform .1s }
+.pick:hover { border-color: var(--accent); transform: translateY(-1px) }
+.pick[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft) }
+.pick b { font-weight: 600; line-height: 1.3 }
+.pick small { color: var(--muted); font: 500 .75rem var(--mono) }
+.pick[aria-pressed="true"] small { color: var(--burn) }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: .85rem }
+.chips button { font: 500 .85rem var(--body); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; cursor: pointer }
+.chips button:hover { border-color: var(--accent) }
+.chips button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink) }
+.tile.goal.done .prog { stroke: var(--good) }
+.tile.goal.done #goalPct, .tile.goal.done #goalText { color: var(--good) }
 
 /* summary */
 .summary { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 10px }
@@ -167,6 +182,8 @@ footer { font-size: .78rem; color: var(--muted); text-align: center }
   .tile .val { font-size: 1.3rem }
   .tile.goal { grid-column: 1 / -1 }
   .hero h1 { font-size: 1.6rem }
+  .quick { grid-template-columns: repeat(2, 1fr) }
+  .pick { padding: 8px 10px }
   .hero .pulse { width: 70%; opacity: .2 }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important } .panel { animation: none } .hero .pulse path { animation: none; stroke-dashoffset: 0 } }
@@ -181,6 +198,7 @@ footer { font-size: .78rem; color: var(--muted); text-align: center }
       <div class="eyebrow"><span class="dot"></span>MOVE · NOURISH · REPEAT</div>
       <h1>สมุดเผาผลาญ</h1>
       <p class="muted">คำนวณแคลอรีจากค่า MET × น้ำหนัก × ชั่วโมง</p>
+      <p class="greet" id="greet"></p>
     </div>
     <div class="save-state" id="saveState">กำลังโหลด…</div>
   </header>
@@ -214,11 +232,15 @@ footer { font-size: .78rem; color: var(--muted); text-align: center }
   <!-- LOG -->
   <section class="panel" data-panel="log">
     <h2>บันทึกการออกกำลังกาย</h2>
+    <div class="quick" id="quickActs" role="group" aria-label="เลือกกิจกรรม"></div>
+    <div class="chips" id="minChips" role="group" aria-label="เลือกเวลา"><span class="muted">เลือกเวลา:</span>
+      <button type="button" data-min="15">15 นาที</button><button type="button" data-min="30">30 นาที</button>
+      <button type="button" data-min="45">45 นาที</button><button type="button" data-min="60">1 ชั่วโมง</button></div>
     <form id="logForm" class="row">
       <label>วันที่<input type="date" id="logDate" required></label>
       <label>กิจกรรม<select id="logAct"></select></label>
       <label>ระยะเวลา (นาที)<input type="number" id="logMin" min="1" max="600" value="30" required inputmode="numeric"></label>
-      <div style="display:grid;align-items:end"><button class="btn" type="submit">บันทึก</button></div>
+      <div style="display:grid;align-items:end"><button class="btn" type="submit" id="logBtn">บันทึก</button></div>
     </form>
     <div class="totals" id="logTotals"></div>
     <div class="list" id="logList"></div>
@@ -404,7 +426,12 @@ function render() {
   const pct = S.goal ? Math.min(100, burn / S.goal * 100) : 0;
   $("ring").style.strokeDashoffset = 169.6 * (1 - pct / 100);
   $("goalPct").textContent = S.goal ? Math.round(burn / S.goal * 100) + "%" : "–";
-  $("goalText").textContent = S.goal ? `${fmt(burn)} / ${fmt(S.goal)} kcal` : "ตั้งได้ที่แท็บ \"เป้าหมาย\"";
+  const done = S.goal > 0 && burn >= S.goal;
+  document.querySelector(".tile.goal").classList.toggle("done", done);
+  $("goalText").textContent = done ? "ถึงเป้าแล้ว เยี่ยมมาก" : S.goal ? `${fmt(burn)} / ${fmt(S.goal)} kcal` : "ตั้งได้ที่แท็บ \"เป้าหมาย\"";
+  $("sStreak").classList.toggle("burn", streak() > 0);
+  const now = new Date(), h = now.getHours();
+  $("greet").textContent = `${h < 12 ? "อรุณสวัสดิ์" : h < 17 ? "สวัสดีตอนบ่าย" : "สวัสดีตอนเย็น"} · ${now.toLocaleDateString("th-TH", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}`;
 
   ["logAct", "calcAct", "planAct"].forEach(id => actOptions($(id)));
   if (document.activeElement !== $("weight")) $("weight").value = S.weight;
@@ -412,7 +439,12 @@ function render() {
   renderLog(); renderCalc(); renderFood(); renderWeek(); renderPlan(); renderActs();
 }
 function renderLog() {
-  const d = $("logDate").value || today();
+  const d = $("logDate").value || today(), sel = $("logAct").value, min = +$("logMin").value || 0;
+  $("quickActs").innerHTML = S.acts.slice(0, 6).map(a => `<button type="button" class="pick" data-pick="${a.id}" aria-pressed="${a.id === sel}">
+    <b>${esc(a.name)}</b><small>${fmt(kcalOf(a.met, S.weight, min))} kcal · ${min} นาที</small></button>`).join("");
+  document.querySelectorAll("#minChips [data-min]").forEach(b => b.setAttribute("aria-pressed", +b.dataset.min === min));
+  const a = actById(sel);
+  $("logBtn").textContent = a && min > 0 ? `บันทึก · ${fmt(kcalOf(a.met, S.weight, min))} kcal` : "บันทึก";
   const rows = S.log.filter(x => x.date === d);
   const total = rows.reduce((a, x) => a + x.kcal, 0), mins = rows.reduce((a, x) => a + x.min, 0);
   $("logTotals").innerHTML = `<span>รวม <b>${fmt(mins)}</b> นาที</span><span>เผาผลาญ <b>${fmt(total)}</b> kcal</span>`;
@@ -495,7 +527,7 @@ function addLog(date, actId, min) {
   commit(); toast(`บันทึก ${a.name} ${min} นาทีแล้ว`);
 }
 $("logForm").onsubmit = e => { e.preventDefault(); addLog($("logDate").value || today(), $("logAct").value, +$("logMin").value) };
-$("logDate").onchange = renderLog;
+$("logDate").onchange = $("logAct").onchange = $("logMin").oninput = renderLog;
 $("calcAdd").onclick = () => { $("logDate").value = today(); addLog(today(), $("calcAct").value, +$("calcMin").value) };
 ["calcAct", "calcMin"].forEach(id => $(id).oninput = renderCalc);
 $("weight").oninput = () => { const v = +$("weight").value; if (v >= 20 && v <= 300) { S.weight = v; save(); renderPlan(); renderActs() } renderCalc() };
@@ -528,6 +560,8 @@ $("actForm").onsubmit = e => {
 
 document.addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.pick) { $("logAct").value = b.dataset.pick; renderLog() }
+  if (b.dataset.min) { $("logMin").value = b.dataset.min; renderLog() }
   if (b.dataset.delLog) { const i = S.log.findIndex(x => x.id === b.dataset.delLog), x = S.log[i]; S.log.splice(i, 1); commit(); toast(`ลบ ${x.name} แล้ว`, () => S.log.splice(i, 0, x)) }
   if (b.dataset.delFood) { const i = S.foods.findIndex(x => x.id === b.dataset.delFood), x = S.foods[i]; S.foods.splice(i, 1); commit(); toast(`ลบ ${x.name} แล้ว`, () => S.foods.splice(i, 0, x)) }
   if (b.dataset.delAct) { const i = S.acts.findIndex(x => x.id === b.dataset.delAct), x = S.acts[i]; S.acts.splice(i, 1);
