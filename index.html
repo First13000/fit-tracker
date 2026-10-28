@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>สมุดเผาผลาญ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one column workbook — summary strip, sticky section tabs, one panel at a time */
+:root {
+  --bg: #eef2f0; --surface: #ffffff; --sunk: #e3e9e6; --line: #cfd8d4;
+  --ink: #15211d; --muted: #5a6964;
+  --accent: #1f6b57; --accent-ink: #ffffff; --accent-soft: #d6ebe3;
+  --burn: #e2552f; --eat: #3a64c8; --good: #1f8a52;
+  --display: "Anuphan", "Noto Sans Thai", system-ui, sans-serif;
+  --body: "IBM Plex Sans Thai", "Noto Sans Thai", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+  --r: 14px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1614; --surface: #17211e; --sunk: #1f2b27; --line: #2c3a35;
+  --ink: #e6efeb; --muted: #94a59f;
+  --accent: #5cc4a3; --accent-ink: #0b1714; --accent-soft: #1d3a31;
+  --burn: #ff7a55; --eat: #7f9ef0; --good: #5ad08e; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1614; --surface: #17211e; --sunk: #1f2b27; --line: #2c3a35;
+  --ink: #e6efeb; --muted: #94a59f;
+  --accent: #5cc4a3; --accent-ink: #0b1714; --accent-soft: #1d3a31;
+  --burn: #ff7a55; --eat: #7f9ef0; --good: #5ad08e; color-scheme: dark }
+
+* { box-sizing: border-box }
+[hidden] { display: none !important }
+body { background: var(--bg); color: var(--ink); font: 15px/1.6 var(--body); }
+.wrap { max-width: 880px; margin: 0 auto; padding-block: 20px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 16px }
+h1, h2 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.25 }
+h1 { font-size: 1.75rem; font-weight: 700 }
+h2 { font-size: 1.15rem; font-weight: 600 }
+.eyebrow { font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600 }
+.muted { color: var(--muted) }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums }
+
+body { background:
+  radial-gradient(600px 400px at 100% 0, var(--accent-soft), transparent 70%),
+  radial-gradient(500px 360px at 0 100%, color-mix(in srgb, var(--burn) 10%, transparent), transparent 70%) fixed, var(--bg) }
+.hero { position: relative; overflow: hidden; border-radius: 20px; padding: 28px 24px 22px;
+  background: linear-gradient(135deg, var(--accent-soft), var(--surface) 60%);
+  border: 1px solid var(--line); display: grid; gap: 10px }
+.hero::before, .hero::after { content: ""; position: absolute; border-radius: 50%; pointer-events: none }
+.hero::before { width: 220px; height: 220px; right: -60px; top: -80px; background: color-mix(in srgb, var(--burn) 16%, transparent) }
+.hero::after { width: 140px; height: 140px; right: 120px; bottom: -90px; background: color-mix(in srgb, var(--eat) 14%, transparent) }
+.hero .pulse { position: absolute; right: 0; top: 50%; translate: 0 -50%; width: min(55%, 360px); height: 110px; color: var(--burn); opacity: .35 }
+.hero .pulse path { stroke-dasharray: 700; stroke-dashoffset: 700; animation: draw 2.4s ease-out .2s forwards }
+@keyframes draw { to { stroke-dashoffset: 0 } }
+.hero-text { position: relative; display: grid; gap: 4px }
+.hero-text p { margin: 0 }
+.hero h1 { font-size: 2.1rem }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--burn); margin-right: 8px; vertical-align: 1px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--burn) 22%, transparent) }
+.save-state { position: relative; font-size: .8rem; color: var(--muted) }
+
+/* summary */
+.summary { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 10px }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px; min-width: 0; position: relative; overflow: hidden }
+.tile::after { content: ""; position: absolute; width: 70px; height: 70px; right: -24px; top: -24px; border-radius: 50%; background: var(--tint, var(--accent-soft)); opacity: .5 }
+.tile > * { position: relative }
+.tile:nth-child(2) { --tint: color-mix(in srgb, var(--burn) 25%, transparent) }
+.tile:nth-child(3) { --tint: color-mix(in srgb, var(--eat) 25%, transparent) }
+.tile .lbl { font-size: .8rem; color: var(--muted) }
+.tile .val { font-family: var(--mono); font-size: 1.6rem; line-height: 1.2 }
+.tile .unit { font-size: .75rem; color: var(--muted) }
+.tile.goal { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center }
+.ring { width: 64px; height: 64px }
+.ring circle { fill: none; stroke-width: 7 }
+.ring .track { stroke: var(--sunk) }
+.ring .prog { stroke: var(--burn); stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dashoffset .4s }
+.val.burn { color: var(--burn) } .val.eat { color: var(--eat) }
+.val.pos { color: var(--burn) } .val.neg { color: var(--good) }
+
+/* tabs */
+nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 6px;
+  display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg) }
+nav button { flex: none; font: 500 .9rem var(--body); color: var(--ink); background: var(--surface); border: 1px solid var(--line);
+  border-radius: 999px; padding: 7px 14px; cursor: pointer }
+nav button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 30%, transparent) }
+nav button { display: inline-flex; align-items: center; gap: 6px; transition: background .15s, border-color .15s }
+nav button:hover:not([aria-selected="true"]) { border-color: var(--accent) }
+nav svg, h2 .badge svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none }
+h2 { display: flex; align-items: center; gap: 10px }
+h2 .badge { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); flex: none }
+h2 .badge svg { width: 18px; height: 18px }
+[data-panel="calc"] h2 .badge, [data-panel="week"] h2 .badge { background: color-mix(in srgb, var(--burn) 16%, transparent); color: var(--burn) }
+[data-panel="food"] h2 .badge { background: color-mix(in srgb, var(--eat) 16%, transparent); color: var(--eat) }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; display: grid; gap: 16px; min-width: 0;
+  box-shadow: 0 10px 30px -18px color-mix(in srgb, var(--ink) 35%, transparent); animation: rise .22s ease-out }
+@keyframes rise { from { transform: translateY(6px) } }
+.btn { transition: transform .1s, box-shadow .15s }
+.btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 14px -6px color-mix(in srgb, var(--accent) 60%, transparent) }
+.btn:active:not(:disabled) { transform: translateY(0) }
+.btn:disabled { opacity: .5; cursor: default }
+input:focus, select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-soft) }
+.item { transition: background .15s; border-radius: 8px; padding-inline: 8px }
+.item:hover { background: var(--bg) }
+.empty { text-align: center; padding: 24px 0; border: 1px dashed var(--line); border-radius: 12px; margin-top: 10px }
+.row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px }
+label { display: grid; gap: 4px; font-size: .85rem; color: var(--muted); min-width: 0 }
+input, select { font: 15px var(--body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; width: 100%; min-width: 0 }
+input[type=checkbox] { width: auto }
+.check { display: flex; align-items: center; gap: 8px; color: var(--ink) }
+.btn { font: 600 .9rem var(--body); border-radius: 10px; padding: 9px 16px; cursor: pointer; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); justify-self: start }
+.btn.ghost { background: transparent; color: var(--accent) }
+.btn.small { padding: 4px 10px; font-size: .8rem }
+.btn.danger { border-color: var(--burn); color: var(--burn); background: transparent }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+
+.result { background: var(--accent-soft); border-radius: 12px; padding: 14px 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px }
+.result .big { font-family: var(--mono); font-size: 1.8rem; color: var(--burn); line-height: 1.1 }
+
+.list { display: grid; border-top: 1px solid var(--line) }
+.item { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); min-width: 0 }
+.item .name { font-weight: 500 }
+.item .meta { font-size: .8rem; color: var(--muted) }
+.empty { color: var(--muted); font-size: .9rem; padding: 12px 0 }
+.totals { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: .9rem }
+.totals b { font-family: var(--mono); font-weight: 500 }
+
+/* chart */
+.chart { display: grid; grid-template-columns: 44px 1fr; gap: 6px }
+.yaxis { position: relative; height: 220px }
+.yaxis span { position: absolute; right: 0; transform: translateY(50%); font: 500 .7rem var(--mono); color: var(--muted) }
+.plot { position: relative; height: 220px; border-bottom: 1px solid var(--line) }
+.grid-line { position: absolute; left: 0; right: 0; border-top: 1px dashed var(--line) }
+.goal-line { position: absolute; left: 0; right: 0; border-top: 2px dashed var(--burn); opacity: .55 }
+.goal-line span { position: absolute; right: 0; top: -18px; font-size: .7rem; color: var(--burn) }
+.cols { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px }
+.col { display: flex; align-items: end; justify-content: center; gap: 3px; min-width: 0 }
+.bar { width: min(22px, 40%); border-radius: 4px 4px 0 0; position: relative; min-height: 0 }
+.bar.b { background: linear-gradient(var(--burn), color-mix(in srgb, var(--burn) 65%, var(--surface))) }
+.bar.e { background: linear-gradient(var(--eat), color-mix(in srgb, var(--eat) 65%, var(--surface))) }
+.bar i { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); font: 500 .62rem var(--mono); font-style: normal; color: var(--muted); padding-bottom: 2px; white-space: nowrap }
+.xaxis { grid-column: 2; display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; font-size: .72rem; color: var(--muted) }
+.xaxis .today { color: var(--ink); font-weight: 600 }
+.legend { display: flex; gap: 16px; font-size: .8rem; color: var(--muted) }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px }
+table { width: 100%; border-collapse: collapse; font-size: .85rem }
+th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--line) }
+th:first-child, td:first-child { text-align: left }
+td { font-family: var(--mono); font-variant-numeric: tabular-nums }
+.scroll { overflow-x: auto }
+
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg);
+  padding: 10px 14px; border-radius: 10px; display: flex; gap: 12px; align-items: center; font-size: .9rem; z-index: 20; max-width: calc(100% - 32px) }
+.toast button { background: none; border: 0; color: var(--bg); font: 600 .9rem var(--body); text-decoration: underline; cursor: pointer }
+footer { font-size: .78rem; color: var(--muted); text-align: center }
+
+@media (max-width: 640px) {
+  .summary { grid-template-columns: repeat(3, 1fr) }
+  .tile .val { font-size: 1.3rem }
+  .tile.goal { grid-column: 1 / -1 }
+  .hero h1 { font-size: 1.6rem }
+  .hero .pulse { width: 70%; opacity: .2 }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important } .panel { animation: none } .hero .pulse path { animation: none; stroke-dashoffset: 0 } }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <svg class="pulse" viewBox="0 0 400 120" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 70 H120 L140 70 L155 30 L172 105 L188 50 L200 70 H260 L272 58 L284 70 H400" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    </svg>
+    <div class="hero-text">
+      <div class="eyebrow"><span class="dot"></span>MOVE · NOURISH · REPEAT</div>
+      <h1>สมุดเผาผลาญ</h1>
+      <p class="muted">คำนวณแคลอรีจากค่า MET × น้ำหนัก × ชั่วโมง</p>
+    </div>
+    <div class="save-state" id="saveState">กำลังโหลด…</div>
+  </header>
+
+  <section class="summary" aria-label="สรุปวันนี้">
+    <div class="tile goal">
+      <svg class="ring" viewBox="0 0 64 64" aria-hidden="true">
+        <circle class="track" cx="32" cy="32" r="27"></circle>
+        <circle class="prog" id="ring" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
+      </svg>
+      <div>
+        <div class="lbl">เป้าหมายวันนี้</div>
+        <div class="val num" id="goalPct">0%</div>
+        <div class="unit" id="goalText">ยังไม่ได้ตั้งเป้า</div>
+      </div>
+    </div>
+    <div class="tile"><div class="lbl">เผาผลาญ</div><div class="val num burn" id="sBurn">0</div><div class="unit">kcal</div></div>
+    <div class="tile"><div class="lbl">กินวันนี้</div><div class="val num eat" id="sEat">0</div><div class="unit">kcal</div></div>
+    <div class="tile"><div class="lbl">ต่อเนื่อง</div><div class="val num" id="sStreak">0</div><div class="unit">วัน</div></div>
+  </section>
+
+  <nav role="tablist" aria-label="ส่วนต่าง ๆ">
+    <button role="tab" data-tab="log" aria-selected="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg>บันทึกวันนี้</button>
+    <button role="tab" data-tab="calc" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>คำนวณ</button>
+    <button role="tab" data-tab="food" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>อาหารหลังออกกำลังกาย</button>
+    <button role="tab" data-tab="week" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M3 3v18h18M8 17v-6M13 17V7M18 17v-4"/></svg>สรุป 7 วัน</button>
+    <button role="tab" data-tab="goal" aria-selected="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>เป้าหมาย</button>
+    <button role="tab" data-tab="acts" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>กิจกรรม</button>
+  </nav>
+
+  <!-- LOG -->
+  <section class="panel" data-panel="log">
+    <h2>บันทึกการออกกำลังกาย</h2>
+    <form id="logForm" class="row">
+      <label>วันที่<input type="date" id="logDate" required></label>
+      <label>กิจกรรม<select id="logAct"></select></label>
+      <label>ระยะเวลา (นาที)<input type="number" id="logMin" min="1" max="600" value="30" required inputmode="numeric"></label>
+      <div style="display:grid;align-items:end"><button class="btn" type="submit">บันทึก</button></div>
+    </form>
+    <div class="totals" id="logTotals"></div>
+    <div class="list" id="logList"></div>
+  </section>
+
+  <!-- CALC -->
+  <section class="panel" data-panel="calc" hidden>
+    <h2>คำนวณแคลอรีที่เผาผลาญ</h2>
+    <div class="row">
+      <label>น้ำหนักของคุณ (กก.)<input type="number" id="weight" min="20" max="300" step="0.1" inputmode="decimal"></label>
+      <label>กิจกรรม<select id="calcAct"></select></label>
+      <label>ระยะเวลา (นาที)<input type="number" id="calcMin" min="1" max="600" value="30" inputmode="numeric"></label>
+    </div>
+    <div class="result">
+      <div><div class="big"><span id="calcOut">0</span> <small style="font-size:.9rem">kcal</small></div><div class="muted" id="calcNote"></div></div>
+      <button class="btn" id="calcAdd" type="button">บันทึกลงวันนี้</button>
+    </div>
+    <p class="muted" style="margin:0;font-size:.85rem">สูตร: kcal = MET × น้ำหนัก (กก.) × เวลา (ชั่วโมง) ผลลัพธ์เปลี่ยนทันทีเมื่อแก้ตัวเลข น้ำหนักที่กรอกใช้กับทุกส่วนของแอป</p>
+  </section>
+
+  <!-- FOOD -->
+  <section class="panel" data-panel="food" hidden>
+    <h2>อาหารหลังออกกำลังกาย</h2>
+    <form id="foodForm" class="row">
+      <label>เลือกจากเมนู<select id="foodPreset"></select></label>
+      <label>รายการอาหาร<input id="foodName" placeholder="เช่น ข้าวมันไก่" required></label>
+      <label>จำนวน (เสิร์ฟ)<input type="number" id="foodQty" min="0.25" step="0.25" value="1" inputmode="decimal"></label>
+      <label>แคลอรีต่อเสิร์ฟ (kcal)<input type="number" id="foodKcal" min="0" required inputmode="numeric"></label>
+      <label>คาร์บต่อเสิร์ฟ (กรัม)<input type="number" id="foodCarb" min="0" inputmode="numeric"></label>
+      <div style="display:grid;align-content:end;gap:8px">
+        <label class="check"><input type="checkbox" id="foodSave">เก็บเป็นเมนูของฉัน</label>
+        <button class="btn" type="submit">เพิ่มอาหาร</button>
+      </div>
+    </form>
+    <div class="totals" id="foodTotals"></div>
+    <div class="list" id="foodList"></div>
+  </section>
+
+  <!-- WEEK -->
+  <section class="panel" data-panel="week" hidden>
+    <div class="actions" style="justify-content:space-between">
+      <h2>สรุป 7 วันล่าสุด</h2>
+      <div class="legend"><span><i style="background:var(--burn)"></i>เผาผลาญ</span><span><i style="background:var(--eat)"></i>กิน</span></div>
+    </div>
+    <div class="chart" id="chart"></div>
+    <div class="scroll"><table id="weekTable"></table></div>
+  </section>
+
+  <!-- GOAL -->
+  <section class="panel" data-panel="goal" hidden>
+    <h2>ตั้งเป้าหมาย</h2>
+    <div class="row">
+      <label>เป้าเผาผลาญต่อวัน (kcal)<input type="number" id="goalKcal" min="0" step="10" inputmode="numeric"></label>
+    </div>
+    <h2 style="font-size:1rem">วางแผนจากเวลาออกกำลังกาย</h2>
+    <div class="row">
+      <label>กิจกรรม<select id="planAct"></select></label>
+      <label>นาทีต่อวัน<input type="number" id="planMin" min="1" value="45" inputmode="numeric"></label>
+      <label>วันต่อสัปดาห์<input type="number" id="planDays" min="1" max="7" value="4" inputmode="numeric"></label>
+    </div>
+    <div class="result">
+      <div>
+        <div class="big"><span id="planDay">0</span> <small style="font-size:.9rem">kcal / วัน</small></div>
+        <div class="muted" id="planWeek"></div>
+      </div>
+      <button class="btn" id="planApply" type="button">ใช้เป็นเป้าต่อวัน</button>
+    </div>
+  </section>
+
+  <!-- ACTIVITIES -->
+  <section class="panel" data-panel="acts" hidden>
+    <h2>กิจกรรมและค่า MET</h2>
+    <form id="actForm" class="row">
+      <label>ชื่อกิจกรรม<input id="actName" placeholder="เช่น โยคะ" required></label>
+      <label>ค่า MET<input type="number" id="actMet" min="1" max="25" step="0.1" placeholder="เช่น 3" required inputmode="decimal"></label>
+      <div style="display:grid;align-items:end"><button class="btn" type="submit" id="actSubmit">เพิ่มกิจกรรม</button></div>
+    </form>
+    <div class="list" id="actList"></div>
+    <p class="muted" style="margin:0;font-size:.85rem">ค่า MET อ้างอิงจาก Compendium of Physical Activities ค่า 1 MET เท่ากับการนั่งพัก</p>
+  </section>
+
+  <footer>ค่าแคลอรีและโภชนาการทั้งหมดเป็นค่าประมาณ</footer>
+</div>
+<div class="toast" id="toast" hidden><span id="toastMsg"></span><button id="toastUndo" type="button">เลิกทำ</button></div>
+
+<script>
+const DEFAULT_ACTS = [
+  ["เดินเร็ว", 4.3], ["วิ่ง (10 กม./ชม.)", 9.8], ["ปั่นจักรยาน", 7.5], ["ว่ายน้ำ", 6], ["โยคะ", 2.5],
+  ["เวทเทรนนิ่ง", 5], ["HIIT", 8], ["กระโดดเชือก", 11.8], ["เต้นแอโรบิก", 7.3], ["แบดมินตัน", 5.5]
+];
+const PRESET_FOODS = [
+  ["ข้าวมันไก่", 600, 75], ["ข้าวกะเพราไก่ไข่ดาว", 630, 70], ["อกไก่ย่าง 100 ก.", 165, 0], ["ไข่ต้ม 2 ฟอง", 155, 1],
+  ["กล้วยหอม", 105, 27], ["นมจืด 200 มล.", 130, 10], ["เวย์โปรตีน 1 สกู๊ป", 120, 3], ["ข้าวสวย 1 ทัพพี", 80, 18],
+  ["สลัดอกไก่", 280, 15], ["โยเกิร์ตกรีก", 100, 4]
+];
+const uid = () => Math.random().toString(36).slice(2, 10);
+const dayStr = d => d.toLocaleDateString("en-CA");
+const today = () => dayStr(new Date());
+const addDays = (s, n) => { const d = new Date(s + "T12:00:00"); d.setDate(d.getDate() + n); return dayStr(d) };
+const fmt = n => Math.round(n).toLocaleString("th-TH");
+const kcalOf = (met, kg, min) => met * kg * min / 60;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+// self-check of the core formula: 4.3 MET, 60 kg, 30 min = 129 kcal
+console.assert(Math.round(kcalOf(4.3, 60, 30)) === 129, "kcal formula");
+
+let S = {
+  weight: 60, goal: 0,
+  acts: DEFAULT_ACTS.map(([name, met]) => ({ id: uid(), name, met })),
+  log: [], foods: [], menus: []
+};
+
+/* ---------- storage: per-person db doc, browser storage as fallback ---------- */
+const LS_KEY = "metbook-v1";
+let store = null, saveTimer = null;
+function setSave(t) { $("saveState").textContent = t }
+async function load() {
+  try { const raw = localStorage.getItem(LS_KEY); if (raw) S = { ...S, ...JSON.parse(raw) } } catch {}
+  render();
+  try {
+    const [db, user] = await Promise.all([window.claude?.use("db"), window.claude?.use("user")]);
+    const id = user && await user.id();
+    if (db && id) {
+      store = db.collection("data/users/" + id).doc("tracker");
+      const snap = await store.get();
+      if (snap.exists) S = { ...S, ...structuredClone(snap.data()) };
+      else await store.set(S);
+      setSave("บันทึกในบัญชีของคุณ");
+      render();
+      return;
+    }
+  } catch (e) { console.warn("db unavailable", e) }
+  setSave("บันทึกในเบราว์เซอร์นี้เท่านั้น");
+}
+function save() {
+  // keep the doc well under the 256 KiB limit: drop entries older than 180 days
+  const cutoff = addDays(today(), -180);
+  S.log = S.log.filter(x => x.date >= cutoff);
+  S.foods = S.foods.filter(x => x.date >= cutoff);
+  try { localStorage.setItem(LS_KEY, JSON.stringify(S)) } catch {}
+  if (!store) return;
+  setSave("กำลังบันทึก…");
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    try { await store.set(JSON.parse(JSON.stringify(S))); setSave("บันทึกในบัญชีของคุณ") }
+    catch (e) { setSave("บันทึกไม่สำเร็จ ข้อมูลยังอยู่ในเบราว์เซอร์นี้"); console.warn(e) }
+  }, 600);
+}
+function commit() { save(); render() }
+
+/* ---------- toast with undo ---------- */
+let undoFn = null, toastTimer = null;
+function toast(msg, undo) {
+  $("toastMsg").textContent = msg; undoFn = undo || null;
+  $("toastUndo").hidden = !undo; $("toast").hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => $("toast").hidden = true, 5000);
+}
+$("toastUndo").onclick = () => { if (undoFn) { undoFn(); undoFn = null; commit() } $("toast").hidden = true };
+
+/* ---------- derived ---------- */
+const burnOn = d => S.log.filter(x => x.date === d).reduce((a, x) => a + x.kcal, 0);
+const eatOn = d => S.foods.filter(x => x.date === d).reduce((a, x) => a + x.kcal * x.qty, 0);
+function streak() {
+  const days = new Set(S.log.map(x => x.date));
+  let d = days.has(today()) ? today() : addDays(today(), -1), n = 0;
+  while (days.has(d)) { n++; d = addDays(d, -1) }
+  return n;
+}
+const actById = id => S.acts.find(a => a.id === id);
+
+/* ---------- render ---------- */
+function actOptions(sel, keep) {
+  const v = keep ?? sel.value;
+  sel.innerHTML = S.acts.map(a => `<option value="${a.id}">${esc(a.name)} (MET ${a.met})</option>`).join("");
+  if (S.acts.some(a => a.id === v)) sel.value = v;
+}
+function render() {
+  const t = today(), burn = burnOn(t), eat = eatOn(t);
+  $("sBurn").textContent = fmt(burn);
+  $("sEat").textContent = fmt(eat);
+  $("sStreak").textContent = streak();
+  const pct = S.goal ? Math.min(100, burn / S.goal * 100) : 0;
+  $("ring").style.strokeDashoffset = 169.6 * (1 - pct / 100);
+  $("goalPct").textContent = S.goal ? Math.round(burn / S.goal * 100) + "%" : "–";
+  $("goalText").textContent = S.goal ? `${fmt(burn)} / ${fmt(S.goal)} kcal` : "ตั้งได้ที่แท็บ \"เป้าหมาย\"";
+
+  ["logAct", "calcAct", "planAct"].forEach(id => actOptions($(id)));
+  if (document.activeElement !== $("weight")) $("weight").value = S.weight;
+  if (document.activeElement !== $("goalKcal")) $("goalKcal").value = S.goal || "";
+  renderLog(); renderCalc(); renderFood(); renderWeek(); renderPlan(); renderActs();
+}
+function renderLog() {
+  const d = $("logDate").value || today();
+  const rows = S.log.filter(x => x.date === d);
+  const total = rows.reduce((a, x) => a + x.kcal, 0), mins = rows.reduce((a, x) => a + x.min, 0);
+  $("logTotals").innerHTML = `<span>รวม <b>${fmt(mins)}</b> นาที</span><span>เผาผลาญ <b>${fmt(total)}</b> kcal</span>`;
+  $("logList").innerHTML = rows.length ? rows.map(x => `
+    <div class="item"><div><div class="name">${esc(x.name)}</div><div class="meta num">${x.min} นาที · MET ${x.met} · ${fmt(x.kcal)} kcal</div></div>
+    <button class="btn small danger" data-del-log="${x.id}" type="button">ลบ</button></div>`).join("")
+    : `<div class="empty">วันนี้ยังไม่มีบันทึก เลือกกิจกรรมและเวลา แล้วกด "บันทึก"</div>`;
+}
+function renderCalc() {
+  const a = actById($("calcAct").value), min = +$("calcMin").value || 0, kg = +$("weight").value || 0;
+  const k = a ? kcalOf(a.met, kg, min) : 0;
+  $("calcOut").textContent = fmt(k);
+  $("calcNote").textContent = a ? `${a.name} ${min} นาที ที่น้ำหนัก ${kg} กก.` : "";
+  $("calcAdd").disabled = !(a && min > 0 && kg > 0);
+}
+function renderFood() {
+  const sel = $("foodPreset"), v = sel.value;
+  const mine = S.menus.map((m, i) => `<option value="m${i}">${esc(m.name)} · ${m.kcal} kcal</option>`).join("");
+  sel.innerHTML = `<option value="">— พิมพ์เอง —</option>` +
+    (mine ? `<optgroup label="เมนูของฉัน">${mine}</optgroup>` : "") +
+    `<optgroup label="เมนูยอดนิยม">${PRESET_FOODS.map((f, i) => `<option value="p${i}">${esc(f[0])} · ${f[1]} kcal</option>`).join("")}</optgroup>`;
+  sel.value = v;
+  const t = today(), rows = S.foods.filter(x => x.date === t);
+  const kc = eatOn(t), carb = rows.reduce((a, x) => a + (x.carb || 0) * x.qty, 0), net = kc - burnOn(t);
+  $("foodTotals").innerHTML = `<span>กินรวม <b>${fmt(kc)}</b> kcal</span><span>คาร์บ <b>${fmt(carb)}</b> ก.</span>
+    <span>เผาผลาญ <b>${fmt(burnOn(t))}</b> kcal</span><span>สุทธิ <b style="color:var(${net > 0 ? "--burn" : "--good"})">${net > 0 ? "+" : ""}${fmt(net)}</b> kcal</span>`;
+  $("foodList").innerHTML = rows.length ? rows.map(x => `
+    <div class="item"><div><div class="name">${esc(x.name)} × ${x.qty}</div><div class="meta num">${fmt(x.kcal * x.qty)} kcal · คาร์บ ${fmt((x.carb || 0) * x.qty)} ก.</div></div>
+    <button class="btn small danger" data-del-food="${x.id}" type="button">ลบ</button></div>`).join("")
+    : `<div class="empty">ยังไม่มีอาหารวันนี้ เลือกจากเมนูหรือพิมพ์เอง แล้วกด "เพิ่มอาหาร"</div>`;
+}
+function niceMax(v) {
+  if (v <= 0) return 100;
+  const p = Math.pow(10, Math.floor(Math.log10(v))), m = v / p;
+  return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * p;
+}
+function renderWeek() {
+  const t = today(), days = [...Array(7)].map((_, i) => addDays(t, i - 6));
+  const data = days.map(d => ({ d, b: burnOn(d), e: eatOn(d) }));
+  const max = niceMax(Math.max(S.goal || 0, ...data.map(x => Math.max(x.b, x.e))));
+  const ticks = [0, .25, .5, .75, 1].map(f => f * max);
+  const y = v => (v / max * 100).toFixed(2) + "%";
+  const lbl = d => { const x = new Date(d + "T12:00:00"); return x.toLocaleDateString("th-TH", { weekday: "short" }) + " " + x.getDate() };
+  $("chart").innerHTML = `
+    <div class="yaxis">${ticks.map(v => `<span style="bottom:${y(v)}">${fmt(v)}</span>`).join("")}</div>
+    <div class="plot">
+      ${ticks.slice(1).map(v => `<div class="grid-line" style="bottom:${y(v)}"></div>`).join("")}
+      ${S.goal ? `<div class="goal-line" style="bottom:${y(S.goal)}"><span>เป้า ${fmt(S.goal)}</span></div>` : ""}
+      <div class="cols">${data.map(x => `<div class="col" title="${lbl(x.d)}: เผาผลาญ ${fmt(x.b)} / กิน ${fmt(x.e)} kcal">
+        <div class="bar b" style="height:${y(x.b)}">${x.b ? `<i>${fmt(x.b)}</i>` : ""}</div>
+        <div class="bar e" style="height:${y(x.e)}">${x.e ? `<i>${fmt(x.e)}</i>` : ""}</div></div>`).join("")}</div>
+    </div>
+    <div class="xaxis">${days.map(d => `<span class="${d === t ? "today" : ""}">${lbl(d)}</span>`).join("")}</div>`;
+  const sb = data.reduce((a, x) => a + x.b, 0), se = data.reduce((a, x) => a + x.e, 0);
+  const active = data.filter(x => x.b > 0).length;
+  $("weekTable").innerHTML = `<thead><tr><th>วัน</th><th>นาที</th><th>เผาผลาญ</th><th>กิน</th><th>สุทธิ</th></tr></thead><tbody>
+    ${data.map(x => { const m = S.log.filter(l => l.date === x.d).reduce((a, l) => a + l.min, 0);
+      return `<tr><td>${lbl(x.d)}</td><td>${fmt(m)}</td><td>${fmt(x.b)}</td><td>${fmt(x.e)}</td><td>${fmt(x.e - x.b)}</td></tr>` }).join("")}
+    <tr><td><b>รวม · ออกกำลัง ${active}/7 วัน</b></td><td></td><td><b>${fmt(sb)}</b></td><td><b>${fmt(se)}</b></td><td><b>${fmt(se - sb)}</b></td></tr></tbody>`;
+}
+function renderPlan() {
+  const a = actById($("planAct").value), min = +$("planMin").value || 0, days = Math.min(7, +$("planDays").value || 0);
+  const per = a ? kcalOf(a.met, S.weight, min) : 0;
+  $("planDay").textContent = fmt(per);
+  $("planWeek").textContent = `${days} วัน/สัปดาห์ ≈ ${fmt(per * days)} kcal ต่อสัปดาห์ (น้ำหนัก ${S.weight} กก.)`;
+}
+let editingAct = null;
+function renderActs() {
+  $("actList").innerHTML = S.acts.map(a => `
+    <div class="item"><div><div class="name">${esc(a.name)}</div><div class="meta num">MET ${a.met} · ${fmt(kcalOf(a.met, S.weight, 30))} kcal ต่อ 30 นาที</div></div>
+    <div class="actions"><button class="btn small ghost" data-edit-act="${a.id}" type="button">แก้ไข</button>
+    <button class="btn small danger" data-del-act="${a.id}" type="button" ${S.acts.length < 2 ? "disabled" : ""}>ลบ</button></div></div>`).join("");
+  $("actSubmit").textContent = editingAct ? "บันทึกการแก้ไข" : "เพิ่มกิจกรรม";
+}
+
+/* ---------- events ---------- */
+function addLog(date, actId, min) {
+  const a = actById(actId); if (!a || !(min > 0)) return;
+  S.log.push({ id: uid(), date, name: a.name, met: a.met, min, kcal: Math.round(kcalOf(a.met, S.weight, min)) });
+  commit(); toast(`บันทึก ${a.name} ${min} นาทีแล้ว`);
+}
+$("logForm").onsubmit = e => { e.preventDefault(); addLog($("logDate").value || today(), $("logAct").value, +$("logMin").value) };
+$("logDate").onchange = renderLog;
+$("calcAdd").onclick = () => { $("logDate").value = today(); addLog(today(), $("calcAct").value, +$("calcMin").value) };
+["calcAct", "calcMin"].forEach(id => $(id).oninput = renderCalc);
+$("weight").oninput = () => { const v = +$("weight").value; if (v >= 20 && v <= 300) { S.weight = v; save(); renderPlan(); renderActs() } renderCalc() };
+$("goalKcal").oninput = () => { S.goal = Math.max(0, +$("goalKcal").value || 0); commit() };
+["planAct", "planMin", "planDays"].forEach(id => $(id).oninput = renderPlan);
+$("planApply").onclick = () => { S.goal = Math.round(+$("planDay").textContent.replace(/,/g, "")); commit(); toast(`ตั้งเป้า ${fmt(S.goal)} kcal ต่อวันแล้ว`) };
+
+$("foodPreset").onchange = () => {
+  const v = $("foodPreset").value; if (!v) return;
+  const f = v[0] === "m" ? S.menus[+v.slice(1)] : (([name, kcal, carb]) => ({ name, kcal, carb }))(PRESET_FOODS[+v.slice(1)]);
+  $("foodName").value = f.name; $("foodKcal").value = f.kcal; $("foodCarb").value = f.carb ?? "";
+};
+$("foodForm").onsubmit = e => {
+  e.preventDefault();
+  const f = { name: $("foodName").value.trim(), kcal: +$("foodKcal").value || 0, carb: +$("foodCarb").value || 0 };
+  if (!f.name) return;
+  S.foods.push({ id: uid(), date: today(), qty: +$("foodQty").value || 1, ...f });
+  if ($("foodSave").checked && !S.menus.some(m => m.name === f.name)) S.menus.push(f);
+  $("foodForm").reset(); $("foodQty").value = 1;
+  commit(); toast(`เพิ่ม ${f.name} แล้ว`);
+};
+
+$("actForm").onsubmit = e => {
+  e.preventDefault();
+  const name = $("actName").value.trim(), met = +$("actMet").value;
+  if (!name || !(met > 0)) return;
+  if (editingAct) Object.assign(actById(editingAct), { name, met }); else S.acts.push({ id: uid(), name, met });
+  editingAct = null; $("actForm").reset(); commit();
+};
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.delLog) { const i = S.log.findIndex(x => x.id === b.dataset.delLog), x = S.log[i]; S.log.splice(i, 1); commit(); toast(`ลบ ${x.name} แล้ว`, () => S.log.splice(i, 0, x)) }
+  if (b.dataset.delFood) { const i = S.foods.findIndex(x => x.id === b.dataset.delFood), x = S.foods[i]; S.foods.splice(i, 1); commit(); toast(`ลบ ${x.name} แล้ว`, () => S.foods.splice(i, 0, x)) }
+  if (b.dataset.delAct) { const i = S.acts.findIndex(x => x.id === b.dataset.delAct), x = S.acts[i]; S.acts.splice(i, 1); commit(); toast(`ลบกิจกรรม ${x.name} แล้ว`, () => S.acts.splice(i, 0, x)) }
+  if (b.dataset.editAct) { const a = actById(b.dataset.editAct); editingAct = a.id; $("actName").value = a.name; $("actMet").value = a.met; renderActs(); $("actName").focus() }
+});
+
+/* ---------- tabs ---------- */
+const TABS = ["log", "calc", "food", "week", "goal", "acts"];
+function showTab(t) {
+  document.querySelectorAll("nav button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
+  document.querySelectorAll("[data-panel]").forEach(p => p.hidden = p.dataset.panel !== t);
+  try { localStorage.setItem(LS_KEY + "-tab", t) } catch {}
+}
+document.querySelectorAll("nav button").forEach(b => {
+  b.onclick = () => showTab(b.dataset.tab);
+  // reuse the tab's icon as a badge on its panel's first heading
+  const h = document.querySelector(`[data-panel="${b.dataset.tab}"] h2`), badge = document.createElement("span");
+  badge.className = "badge"; badge.setAttribute("aria-hidden", "true"); badge.append(b.querySelector("svg").cloneNode(true)); h.prepend(badge);
+});
+let startTab = location.hash.slice(1);
+if (!TABS.includes(startTab)) { try { startTab = localStorage.getItem(LS_KEY + "-tab") } catch {} }
+showTab(TABS.includes(startTab) ? startTab : "log");
+
+$("logDate").value = today();
+load();
+</script>
+
+</body>
+</html>
