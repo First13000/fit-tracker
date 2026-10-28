@@ -161,8 +161,42 @@ td { font-variant-numeric: tabular-nums }
 .tabbar button[aria-selected="true"] { color: var(--accent) }
 .tabbar button[aria-selected="true"] svg { filter: drop-shadow(0 0 8px color-mix(in srgb, var(--accent) 70%, transparent)) }
 
-.panel { display: grid; gap: 14px; animation: rise .22s ease-out }
-@keyframes rise { from { transform: translateY(8px) } }
+.panel { display: grid; gap: 14px }
+
+/* motion */
+@keyframes inUp { from { opacity: .2; transform: translateY(14px) } }
+@keyframes pop { 40% { transform: scale(1.07) } }
+@keyframes wiggle { 25% { transform: rotate(-14deg) scale(1.15) } 75% { transform: rotate(12deg) scale(1.15) } }
+@keyframes flicker { 50% { transform: scale(1.2) rotate(-7deg) } }
+@keyframes shimmer { from { transform: translateX(-120%) } to { transform: translateX(320%) } }
+@keyframes grow { from { transform: scaleY(0) } }
+@keyframes floatUp { from { opacity: 1; transform: translateY(0) scale(.9) } to { opacity: 0; transform: translateY(-56px) scale(1.15) } }
+@keyframes bump { 35% { transform: scale(1.035) } }
+@keyframes tabBounce { 30% { transform: translateY(-6px) } 60% { transform: translateY(1px) } }
+@keyframes confetti { to { transform: translate(var(--dx), var(--dy)) rotate(var(--r)); opacity: 0 } }
+@keyframes slideIn { from { transform: translateX(-16px); opacity: .2; background: color-mix(in srgb, var(--accent) 35%, var(--raised)) } }
+@keyframes toastIn { from { transform: translate(-50%, 24px); opacity: 0 } }
+.panel > * { animation: inUp .45s cubic-bezier(.2, .8, .2, 1) both }
+.panel > :nth-child(2) { animation-delay: .07s }
+.panel > :nth-child(3) { animation-delay: .14s }
+.hero.bump { animation: bump .45s ease-out }
+.hero > .float { position: absolute; left: 22px; top: 64px; font: italic 800 2rem var(--font); color: var(--on-accent); pointer-events: none;
+  text-shadow: 0 2px 12px var(--shade); animation: floatUp 1.1s ease-out forwards }
+.hero > .confetti { position: absolute; left: 50%; top: 45%; width: 8px; height: 13px; border-radius: 2px; pointer-events: none;
+  animation: confetti 1.2s cubic-bezier(.2, .7, .3, 1) forwards }
+.flame { display: inline-block; animation: flicker 1.6s ease-in-out infinite }
+.bar i { position: relative; overflow: hidden }
+.bar i::after { content: ""; position: absolute; inset: 0; width: 40%; background: linear-gradient(90deg, transparent, var(--ecg-base), transparent);
+  animation: shimmer 2.6s ease-in-out infinite }
+.pick .emo { display: inline-block; transition: transform .2s }
+.pick:hover .emo { transform: scale(1.15) rotate(-6deg) }
+.pick.just { animation: pop .3s ease-out }
+.pick.just .emo { animation: wiggle .5s ease-in-out }
+.chips button[aria-pressed="true"] { animation: pop .25s ease-out }
+.item.new { animation: slideIn .6s cubic-bezier(.2, .8, .2, 1) }
+.bar-v { transform-origin: bottom; animation: grow .7s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(var(--i) * 60ms) }
+.tabbar button[aria-selected="true"] svg { animation: tabBounce .45s ease-out }
+.toast { animation: toastIn .3s cubic-bezier(.2, .8, .2, 1) }
 .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(84px + env(safe-area-inset-bottom, 0px)); z-index: 20;
   background: var(--ink); color: var(--bg); padding: 12px 16px; border-radius: 14px; display: flex; gap: 14px; align-items: center;
   font-weight: 500; max-width: calc(100% - 32px); box-shadow: 0 12px 30px -10px #000 }
@@ -173,7 +207,10 @@ footer { font-size: .78rem; color: var(--muted); text-align: center }
   .big { font-size: 3.9rem }
   .row3 { grid-template-columns: 1fr 1fr }
 }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important } .panel, .ecg .beat { animation: none } .ecg .beat { stroke-dasharray: none; opacity: .5 } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important }
+  .ecg .beat { stroke-dasharray: none; opacity: .5 }
+}
 </style>
 
 <div class="wrap">
@@ -189,7 +226,7 @@ footer { font-size: .78rem; color: var(--muted); text-align: center }
         <path class="base" pathLength="100" d="M0 55H90L105 55L115 22L128 88L140 38L150 55H230L245 55L255 22L268 88L280 38L290 55H400"/>
         <path class="beat" pathLength="100" d="M0 55H90L105 55L115 22L128 88L140 38L150 55H230L245 55L255 22L268 88L280 38L290 55H400"/>
       </svg>
-      <div class="hero-top"><span class="day" id="greet"></span><span class="streak">🔥 <span id="sStreak">0</span> วันติด</span></div>
+      <div class="hero-top"><span class="day" id="greet"></span><span class="streak"><i class="flame" aria-hidden="true">🔥</i> <span id="sStreak">0</span> วันติด</span></div>
       <div class="big"><span id="sBurn">0</span><small>KCAL</small></div>
       <div class="hero-sub" id="goalText"></div>
       <div class="bar"><i id="goalBar"></i></div>
@@ -404,6 +441,38 @@ function streak() {
 const actById = id => S.acts.find(a => a.id === id);
 const signed = n => (n > 0 ? "+" : "") + fmt(n);
 
+/* ---------- motion helpers ---------- */
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let flashId = null; // id of the row just added, so only that row slides in
+function flash(id) { flashId = id; setTimeout(() => { if (flashId === id) flashId = null }, 800) }
+function countTo(el, to) {
+  const from = el._v ?? 0; el._v = to;
+  if (calm || from === to) { el.textContent = fmt(to); return }
+  const t0 = performance.now();
+  cancelAnimationFrame(el._raf);
+  const step = t => {
+    const p = Math.min(1, (t - t0) / 700);
+    el.textContent = fmt(from + (to - from) * (1 - Math.pow(1 - p, 3)));
+    if (p < 1) el._raf = requestAnimationFrame(step);
+  };
+  el._raf = requestAnimationFrame(step);
+}
+function celebrate(kcal, goalHit) {
+  if (calm) return;
+  const hero = $("hero"), f = document.createElement("span");
+  f.className = "float"; f.textContent = "+" + fmt(kcal); f.onanimationend = () => f.remove(); hero.append(f);
+  hero.classList.remove("bump"); void hero.offsetWidth; hero.classList.add("bump");
+  if (!goalHit) return;
+  const colors = ["--on-accent", "--accent-2", "--good", "--eat"];
+  for (let i = 0; i < 32; i++) {
+    const c = document.createElement("i");
+    c.className = "confetti";
+    c.style.cssText = `--dx:${Math.random() * 340 - 170}px;--dy:${Math.random() * -170 + 50}px;--r:${Math.random() * 720 - 360}deg;background:var(${colors[i % 4]});animation-delay:${Math.random() * .15}s`;
+    c.onanimationend = () => c.remove();
+    hero.append(c);
+  }
+}
+
 /* ---------- render ---------- */
 function actOptions(sel) {
   const v = sel.value;
@@ -414,8 +483,8 @@ function render() {
   const t = today(), burn = burnOn(t), eat = eatOn(t), done = S.goal > 0 && burn >= S.goal;
   const now = new Date(), h = now.getHours();
   $("greet").textContent = `${h < 12 ? "อรุณสวัสดิ์" : h < 17 ? "สวัสดีตอนบ่าย" : "สวัสดีตอนเย็น"} · ${now.toLocaleDateString("th-TH", { weekday: "short", day: "numeric", month: "short" })}`;
-  $("sBurn").textContent = fmt(burn);
-  $("sEat").textContent = fmt(eat);
+  countTo($("sBurn"), burn);
+  countTo($("sEat"), eat);
   $("sNet").textContent = signed(eat - burn);
   $("sGoal").textContent = S.goal ? fmt(S.goal) : "–";
   $("sStreak").textContent = streak();
@@ -447,7 +516,7 @@ function renderLog() {
   $("logTitle").textContent = d === today() ? "วันนี้ทำไปแล้ว" : "วันที่ " + new Date(d + "T12:00:00").toLocaleDateString("th-TH", { day: "numeric", month: "short" });
   $("logTotals").textContent = rows.length ? `${fmt(rows.reduce((s, x) => s + x.min, 0))} นาที · ${fmt(rows.reduce((s, x) => s + x.kcal, 0))} kcal` : "";
   $("logList").innerHTML = rows.length ? rows.map(x => `
-    <div class="item"><span class="emo" aria-hidden="true">${emo(x.name)}</span>
+    <div class="item${x.id === flashId ? " new" : ""}"><span class="emo" aria-hidden="true">${emo(x.name)}</span>
       <div><div class="name">${esc(x.name)}</div><div class="meta">${x.min} นาที · MET ${x.met}</div></div>
       <span class="kc">${fmt(x.kcal)}</span><button class="x" data-del-log="${x.id}" type="button" aria-label="ลบ ${esc(x.name)}">×</button></div>`).join("")
     : `<div class="empty">ยังไม่มีบันทึก เลือกกิจกรรมด้านบนแล้วกดบันทึกได้เลย</div>`;
@@ -464,7 +533,7 @@ function renderFood() {
   $("foodTotals").innerHTML = `<div><span>กินรวม</span><b style="color:var(--eat)">${fmt(kc)}</b></div><div><span>คาร์บ (ก.)</span><b>${fmt(carb)}</b></div>
     <div><span>สุทธิ (กิน − เผา)</span><b style="color:var(${net > 0 ? "--accent" : "--good"})">${signed(net)}</b></div>`;
   $("foodList").innerHTML = rows.length ? rows.map(x => `
-    <div class="item"><span class="emo" aria-hidden="true">🍽️</span>
+    <div class="item${x.id === flashId ? " new" : ""}"><span class="emo" aria-hidden="true">🍽️</span>
       <div><div class="name">${esc(x.name)} × ${x.qty}</div><div class="meta">คาร์บ ${fmt((x.carb || 0) * x.qty)} ก.</div></div>
       <span class="kc eat">${fmt(x.kcal * x.qty)}</span><button class="x" data-del-food="${x.id}" type="button" aria-label="ลบ ${esc(x.name)}">×</button></div>`).join("")
     : `<div class="empty">ยังไม่มีอาหารวันนี้</div>`;
@@ -487,7 +556,7 @@ function renderWeek() {
     <div class="plot">
       ${ticks.slice(1).map(v => `<div class="grid-line" style="bottom:${y(v)}"></div>`).join("")}
       ${S.goal ? `<div class="goal-line" style="bottom:${y(S.goal)}"><span>เป้า ${fmt(S.goal)}</span></div>` : ""}
-      <div class="cols">${data.map(x => `<div class="col" title="${wd(x.d)} ${dn(x.d)}: เผาผลาญ ${fmt(x.b)} / กิน ${fmt(x.e)} kcal">
+      <div class="cols">${data.map((x, i) => `<div class="col" style="--i:${i}" title="${wd(x.d)} ${dn(x.d)}: เผาผลาญ ${fmt(x.b)} / กิน ${fmt(x.e)} kcal">
         <div class="bar-v b" style="height:${y(x.b)}">${x.b ? `<i>${fmt(x.b)}</i>` : ""}</div>
         <div class="bar-v e" style="height:${y(x.e)}">${x.e ? `<i>${fmt(x.e)}</i>` : ""}</div></div>`).join("")}</div>
     </div>
@@ -517,8 +586,11 @@ function renderActs() {
 /* ---------- events ---------- */
 function addLog(date, actId, min) {
   const a = actById(actId); if (!a || !(min > 0)) return;
-  S.log.push({ id: uid(), date, name: a.name, met: a.met, min, kcal: Math.round(kcalOf(a.met, S.weight, min)) });
-  commit(); toast(`บันทึก ${a.name} ${min} นาทีแล้ว`);
+  const reached = () => S.goal > 0 && burnOn(today()) >= S.goal, wasDone = reached();
+  const id = uid(), kcal = Math.round(kcalOf(a.met, S.weight, min));
+  S.log.push({ id, date, name: a.name, met: a.met, min, kcal });
+  flash(id); commit(); toast(`บันทึก ${a.name} ${min} นาทีแล้ว`);
+  if (date === today()) celebrate(kcal, !wasDone && reached());
 }
 $("logForm").onsubmit = e => { e.preventDefault(); addLog($("logDate").value || today(), selAct, +$("logMin").value) };
 $("logDate").onchange = $("logMin").oninput = renderLog;
@@ -537,7 +609,9 @@ $("foodForm").onsubmit = e => {
   e.preventDefault();
   const f = { name: $("foodName").value.trim(), kcal: +$("foodKcal").value || 0, carb: +$("foodCarb").value || 0 };
   if (!f.name) return;
-  S.foods.push({ id: uid(), date: today(), qty: +$("foodQty").value || 1, ...f });
+  const id = uid();
+  S.foods.push({ id, date: today(), qty: +$("foodQty").value || 1, ...f });
+  flash(id);
   if ($("foodSave").checked && !S.menus.some(m => m.name === f.name)) S.menus.push(f);
   $("foodForm").reset(); $("foodQty").value = 1;
   commit(); toast(`เพิ่ม ${f.name} แล้ว`);
@@ -553,7 +627,7 @@ $("actForm").onsubmit = e => {
 
 document.addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
-  if (b.dataset.pick) { selAct = b.dataset.pick; renderLog() }
+  if (b.dataset.pick) { selAct = b.dataset.pick; renderLog(); document.querySelector(`[data-pick="${selAct}"]`)?.classList.add("just") }
   if (b.dataset.min) { $("logMin").value = b.dataset.min; renderLog() }
   if (b.dataset.delLog) { const i = S.log.findIndex(x => x.id === b.dataset.delLog), x = S.log[i]; S.log.splice(i, 1); commit(); toast(`ลบ ${x.name} แล้ว`, () => S.log.splice(i, 0, x)) }
   if (b.dataset.delFood) { const i = S.foods.findIndex(x => x.id === b.dataset.delFood), x = S.foods[i]; S.foods.splice(i, 1); commit(); toast(`ลบ ${x.name} แล้ว`, () => S.foods.splice(i, 0, x)) }
